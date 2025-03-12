@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InteractSource : MonoBehaviour, IInteractable
+public class InteractSource : MonoBehaviour
 {
     public void Interact()
     {
