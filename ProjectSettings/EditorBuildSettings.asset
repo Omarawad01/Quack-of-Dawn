@@ -9,8 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menue.unity
     guid: 1ad57712015b76240b94d3154215a642
   - enabled: 1
-    path: Assets/Scenes/Juans Scene.unity
+    path: Assets/Juans Folder/Scenes/Juans Scene.unity
     guid: 490aaab0a9f500f4fac2d42f7844a5ff
+  - enabled: 1
+    path: Assets/Scenes/GameOver.unity
+    guid: 06f079f01b9fdc44faa1c566a761fbeb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   m_UseUCBPForAssetBundles: 0

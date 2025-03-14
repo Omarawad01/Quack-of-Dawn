@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class Fireball : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class Fireball : MonoBehaviour
         if (player != null)
         {
             Debug.Log("Player Hit");
+            player.Hurt(damage);
         }
         Destroy(gameObject);
     }

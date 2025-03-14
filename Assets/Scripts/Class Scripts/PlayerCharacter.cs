@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    private int health;
-    private int shield;
+    private float health;
+    private float shield;
 
 
     void Start()
@@ -12,14 +13,21 @@ public class PlayerCharacter : MonoBehaviour
         shield = 3;
     }
 
-    public void Hurt(int damage)
+    public void Hurt(float damage)
     {
-        shield -= damage;
         if (shield > 0)
         {
             shield -= damage;
             Debug.Log($"Shield: " + shield);
-            return;
+        }
+        if (shield == 0)
+        {
+            health -= damage;
+            Debug.Log($"Health: " + health);
+        }
+        if (health == 0)
+        {
+            SceneManager.LoadScene("GameOver");
         }
     }
 }
