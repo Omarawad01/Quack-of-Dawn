@@ -2,35 +2,29 @@ using UnityEngine;
 
 public class PickupItem : MonoBehaviour
 {
-    public Transform handTransform;  // Reference to the hand where items are held
-    public float pickupRadius = 2f;  // Radius in which items can be picked up
-    private GameObject heldItem;     // Stores the currently held item
+    [Header("References")]
+    public Transform handTransform;
+    public float pickupRadius = 2f;
+    public Vector3 holdPositionOffset = Vector3.zero;
+    public Vector3 holdRotationOffset = Vector3.zero;
+
+    private GameObject heldItem;
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (heldItem == null)
-            {
-                TryPickupItem();
-            }
-            else
-            {
-                DropItem();
-            }
-        }
+        if (Input.GetKeyDown(KeyCode.E)) TryPickupItem();
+        if (Input.GetKeyDown(KeyCode.Q)) DropItem();
     }
 
-    void TryPickupItem()
+    public void TryPickupItem()
     {
-        // Find all colliders in the pickup radius
         Collider[] colliders = Physics.OverlapSphere(transform.position, pickupRadius);
         GameObject closestItem = null;
         float closestDistance = Mathf.Infinity;
 
         foreach (Collider col in colliders)
         {
-            if (col.CompareTag("Pickup")) // Check if the object is a valid pickup
+            if (col.CompareTag("Pickup"))
             {
                 float distance = Vector3.Distance(transform.position, col.transform.position);
                 if (distance < closestDistance)
@@ -41,44 +35,50 @@ public class PickupItem : MonoBehaviour
             }
         }
 
-        if (closestItem != null)
-        {
-            AttachItem(closestItem);
-        }
+        if (closestItem != null) AttachItem(closestItem);
     }
 
     void AttachItem(GameObject item)
     {
         heldItem = item;
-        item.transform.SetParent(handTransform);
-        item.transform.localPosition = Vector3.zero;
-        item.transform.localRotation = Quaternion.identity;
 
-        // Disable physics so it doesn't fall
         Rigidbody rb = item.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.isKinematic = true;
+            // Kinematic bodies ignore velocity, so no need to set linear/angularVelocity
         }
-    }
 
-    void DropItem()
-    {
-        if (heldItem != null)
+        foreach (Collider c in item.GetComponents<Collider>())
         {
-            // Re-enable physics and unparent the object
-            Rigidbody rb = heldItem.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-            }
-
-            heldItem.transform.SetParent(null);
-            heldItem = null;
+            c.enabled = false;
         }
+
+        item.transform.SetParent(handTransform);
+        item.transform.localPosition = holdPositionOffset;
+        item.transform.localRotation = Quaternion.Euler(holdRotationOffset);
     }
 
-    // Debugging: Draw the pickup radius in the scene view
+    public void DropItem()
+    {
+        if (heldItem == null) return;
+
+        Rigidbody rb = heldItem.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.AddForce(transform.forward * 3f, ForceMode.Impulse); // Valid for non-kinematic bodies
+        }
+
+        foreach (Collider c in heldItem.GetComponents<Collider>())
+        {
+            c.enabled = true;
+        }
+
+        heldItem.transform.SetParent(null);
+        heldItem = null;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;

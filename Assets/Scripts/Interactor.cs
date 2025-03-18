@@ -1,30 +1,38 @@
+// In Interactor.cs
 using UnityEngine;
-
-interface IInteractable
-{
-    void Interact();
-}
 
 public class Interactor : MonoBehaviour
 {
-    public Transform InteractorSource;
-    public float InteractorRange = 2f; // Adjust as needed for your range
+    [SerializeField] private PickupItem pickupItem; // Assign in Inspector
 
     void Update()
     {
+        // Handle pickup (E key)
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Ray r = new Ray(InteractorSource.position, InteractorSource.forward);
-            if (Physics.Raycast(r, out RaycastHit hitInfo, InteractorRange))
-            {
-                // Check if the hit object has the IInteractable interface and the PickUpItem script
-                if (hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObj) &&
-                    hitInfo.collider.gameObject.TryGetComponent(out PickupItem pickUpItem))
-                {
-                    // If both components are found, interact with the item
-                    interactObj.Interact();
-                }
-            }
+            TryPickup();
+        }
+
+        // Handle drop (Q key)
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            TryDrop();
+        }
+    }
+
+    public void TryPickup()
+    {
+        if (pickupItem != null)
+        {
+            pickupItem.TryPickupItem();
+        }
+    }
+
+    public void TryDrop()
+    {
+        if (pickupItem != null)
+        {
+            pickupItem.DropItem(); // Call the public DropItem method
         }
     }
 }
