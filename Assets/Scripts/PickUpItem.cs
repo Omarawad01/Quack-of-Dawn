@@ -2,30 +2,86 @@ using UnityEngine;
 
 public class PickupItem : MonoBehaviour
 {
-    // Reference to the hand transform (set in the inspector)
-    public Transform handTransform;
+    public Transform handTransform;  // Reference to the hand where items are held
+    public float pickupRadius = 2f;  // Radius in which items can be picked up
+    private GameObject heldItem;     // Stores the currently held item
 
-    private void OnTriggerEnter(Collider other)
+    void Update()
     {
-        // Check if the object is a pickup (by tag, layer, etc.)
-        if (other.CompareTag("Pickup"))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            AttachItem(other.gameObject);
+            if (heldItem == null)
+            {
+                TryPickupItem();
+            }
+            else
+            {
+                DropItem();
+            }
+        }
+    }
+
+    void TryPickupItem()
+    {
+        // Find all colliders in the pickup radius
+        Collider[] colliders = Physics.OverlapSphere(transform.position, pickupRadius);
+        GameObject closestItem = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Collider col in colliders)
+        {
+            if (col.CompareTag("Pickup")) // Check if the object is a valid pickup
+            {
+                float distance = Vector3.Distance(transform.position, col.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestItem = col.gameObject;
+                }
+            }
+        }
+
+        if (closestItem != null)
+        {
+            AttachItem(closestItem);
         }
     }
 
     void AttachItem(GameObject item)
     {
-        // Parent the item to the hand and reset its local transform
+        heldItem = item;
         item.transform.SetParent(handTransform);
         item.transform.localPosition = Vector3.zero;
         item.transform.localRotation = Quaternion.identity;
 
-        // Disable physics so it doesn’t interfere with animation
+        // Disable physics so it doesn't fall
         Rigidbody rb = item.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.isKinematic = true;
         }
+    }
+
+    void DropItem()
+    {
+        if (heldItem != null)
+        {
+            // Re-enable physics and unparent the object
+            Rigidbody rb = heldItem.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+            }
+
+            heldItem.transform.SetParent(null);
+            heldItem = null;
+        }
+    }
+
+    // Debugging: Draw the pickup radius in the scene view
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, pickupRadius);
     }
 }
