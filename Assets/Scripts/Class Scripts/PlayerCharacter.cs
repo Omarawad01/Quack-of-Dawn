@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerCharacter : MonoBehaviour
+
+
 {
     [SerializeField] private float maxHealth = 10;
     private float currentHealth;
@@ -34,4 +36,6 @@ public class PlayerCharacter : MonoBehaviour
 
     }
 }
+
+
 
