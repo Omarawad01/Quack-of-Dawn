@@ -2,32 +2,40 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerCharacter : MonoBehaviour
-{
-    private float health;
-    private float shield;
 
+
+{
+    [SerializeField] private float maxHealth = 10;
+    private float currentHealth;
+
+    public Healthbar healthBar;
 
     void Start()
     {
-        health = 5;
-        shield = 3;
+        currentHealth = maxHealth;
+        healthBar.SetMaxHealth(maxHealth);
+    }
+
+    void Update()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     public void Hurt(float damage)
     {
-        if (shield > 0)
-        {
-            shield -= damage;
-            Debug.Log($"Shield: " + shield);
-        }
-        if (shield == 0)
-        {
-            health -= damage;
-            Debug.Log($"Health: " + health);
-        }
-        if (health == 0)
+        currentHealth -= damage;
+        Debug.Log($"Health: " + currentHealth);
+
+        if (currentHealth == 0)
         {
             SceneManager.LoadScene("GameOver");
         }
+
     }
 }
+
+
+
